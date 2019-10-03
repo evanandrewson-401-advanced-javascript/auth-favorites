@@ -30,7 +30,29 @@ describe('me API', () => {
           .expect(200)
           .then(result => {
             expect(result.body).toEqual([body._id])
-          })
-      })
+          });
+      });
+  });
+
+  it('deletes a crystal from favorites', () => {
+    return request
+      .post('/api/crystals')
+      .set('Authorization', user.token)
+      .send(crystal)
+      .then(({ body }) => {
+        return request
+          .put(`/api/me/favorites/${body._id}`)
+          .set('Authorization', user.token)
+          .expect(200)
+          .then(result => {
+            return request
+              .delete(`/api/me/favorites/${body._id}`)
+              .set('Authorization', user.token)
+              .expect(200)
+              .then(result2 => {
+                expect(result2.body).toEqual([]);
+              });
+          });
+      });
   })
 });
