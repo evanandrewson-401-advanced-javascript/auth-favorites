@@ -74,8 +74,49 @@ describe('Crystals API', () => {
         return request
           .delete(`/api/crystals/${body._id}`)
           .set('Authorization', user.token)
-          .expect(200)
+          .expect(200);
       });
-  })
+  });
 
+  it('gets all crystals', () => {
+    return Promise.all([
+      request
+        .post('/api/crystals')
+        .set('Authorization', user.token)
+        .send(crystal),
+      request
+        .post('/api/crystals')
+        .set('Authorization', user.token)
+        .send(crystal),
+      request
+        .post('/api/crystals')
+        .set('Authorization', user.token)
+        .send(crystal)
+    ]).then(() => {
+      return request
+        .get('/api/crystals')
+        .set('Authorization', user.token)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.length).toBe(3);
+          expect(body[0]).toMatchInlineSnapshot(
+            {
+              _id: expect.any(String),
+              owner: expect.any(String)
+            },
+            `
+            Object {
+              "__v": 0,
+              "_id": Any<String>,
+              "category": "quartz",
+              "description": "purple and amazing",
+              "name": "Amethyst",
+              "owner": Any<String>,
+              "price": 5,
+            }
+          `
+          );
+        });
+    });
+  });
 });
