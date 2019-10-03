@@ -22,10 +22,9 @@ describe('Crystals API', () => {
     return request
       .post('/api/crystals')
       .set('Authorization', user.token)
-      .send(crystal, user)
+      .send(crystal)
       .expect(200)
       .then(({ body }) => {
-        console.log(body);
         expect(body.owner).toBe(user._id);
         expect(body).toMatchInlineSnapshot(
           {
@@ -46,4 +45,25 @@ describe('Crystals API', () => {
         );
       });
   });
+
+  it('updates a crystal', () => {
+    return request
+      .post('/api/crystals')
+      .set('Authorization', user.token)
+      .send(crystal)
+      .expect(200)
+      .then(({ body }) => {
+        return request
+          .put(`/api/crystals/${body._id}`)
+          .set('Authorization', user.token)
+          .send({ price: 10 })
+          .expect(200)
+          .then(({ body }) => {
+            console.log(body);
+            expect(body.price).toBe(10);
+          });
+      });
+  });
+
+
 });
