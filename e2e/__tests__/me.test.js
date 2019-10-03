@@ -54,5 +54,28 @@ describe('me API', () => {
               });
           });
       });
+  });
+
+  it('gets all favorites for a user', () => {
+    return request
+      .post('/api/crystals')
+      .set('Authorization', user.token)
+      .send(crystal)
+      .then(({ body }) => {
+        return request
+          .put(`/api/me/favorites/${body._id}`)
+          .set('Authorization', user.token)
+          .expect(200)
+          .then(() => {
+            return request
+              .get(`/api/me/favorites/`)
+              .set('Authorization', user.token)
+              .expect(200)
+              .then(result2 => {
+                console.log(result2.body)
+                expect(result2.body).toEqual([{ _id: body._id }]);
+              });
+          });
+      });
   })
 });
