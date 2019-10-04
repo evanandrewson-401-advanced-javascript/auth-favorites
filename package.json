@@ -15,7 +15,7 @@
     "test:verbose": "npm run test -- --verbose",
     "start": "node server.js",
     "start:watch": "nodemon server.js",
-    "load:cats": "mongoimport --db famous-cats --collection cats --drop --jsonArray --file ./data/cats.json"
+    "create:admin": "node ./lib/make-admin.js"
   },
   "keywords": [],
   "author": "",
