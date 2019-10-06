@@ -80,4 +80,14 @@ describe('Pirates API', () => {
           });
       });
   })
+
+  it('admin can delete pirates', () => {
+    return postPirate(blackbeard)
+      .then(({ body }) => {
+        return request
+          .delete(`/api/pirates/${body._id}`)
+          .set('Authorization', user.token)
+          .expect(200)
+      });
+  })
 });
