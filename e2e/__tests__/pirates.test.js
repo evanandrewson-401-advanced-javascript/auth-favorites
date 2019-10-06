@@ -68,26 +68,52 @@ describe('Pirates API', () => {
   });
 
   it('admin can update pirates', () => {
-    return postPirate(blackbeard)
-      .then(({ body }) => {
-        return request
-          .put(`/api/pirates/${body._id}`)
-          .set('Authorization', user.token)
-          .send({name: 'Bluebeard' })
-          .expect(200)
-          .then(({ body }) => {
-            expect(body.name).toBe('Bluebeard');
-          });
-      });
-  })
+    return postPirate(blackbeard).then(({ body }) => {
+      return request
+        .put(`/api/pirates/${body._id}`)
+        .set('Authorization', user.token)
+        .send({ name: 'Bluebeard' })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.name).toBe('Bluebeard');
+        });
+    });
+  });
 
   it('admin can delete pirates', () => {
-    return postPirate(blackbeard)
-      .then(({ body }) => {
-        return request
-          .delete(`/api/pirates/${body._id}`)
-          .set('Authorization', user.token)
-          .expect(200)
-      });
-  })
+    return postPirate(blackbeard).then(({ body }) => {
+      return request
+        .delete(`/api/pirates/${body._id}`)
+        .set('Authorization', user.token)
+        .expect(200);
+    });
+  });
+
+  it('any user can get all pirates', () => {
+    return Promise.all([
+      postPirate(blackbeard),
+      postPirate(blackbeard),
+      postPirate(blackbeard)
+    ]).then(() => {
+      return request
+        .get('/api/pirates')
+        .set('Authorization', user.token)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.length).toBe(3);
+          expect(body[0]).toMatchInlineSnapshot(
+            {
+              _id: expect.any(String)
+            },
+            `
+            Object {
+              "__v": 0,
+              "_id": Any<String>,
+              "name": "Blackbeard",
+            }
+          `
+          );
+        });
+    });
+  });
 });
