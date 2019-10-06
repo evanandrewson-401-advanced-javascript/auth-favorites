@@ -170,7 +170,6 @@ describe('Auth API', () => {
               .expect(200);
           })
           .then(finalResult => {
-            console.log(finalResult.body);
             expect(finalResult.body).toMatchInlineSnapshot(
               {
                 _id: expect.any(String),
