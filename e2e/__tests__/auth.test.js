@@ -123,29 +123,23 @@ describe('Auth API', () => {
       .expect(401);
   });
 
-  it.only('allows an admin to change roles', async () => {
-    // const users = await User.find()
-    // console.log(users);
+  it('allows an admin to change roles', () => {
     return request
       .post('/api/auth/signup')
       .send({ email: 'new@new.com', password: '123' })
       .expect(200)
       .then(({ body }) => {
-        console.log(body);
-        return (
-          request
-            .put(`/api/auth/users/${body._id}/roles/admin`)
-            .set('Authorization', user.token)
-            // .send({roles: ['admin']})
-            .expect(200)
-            .then(result => {
-              console.log(result.body);
-              expect(result.body).toMatchInlineSnapshot(
-                {
-                  _id: expect.any(String),
-                  hash: expect.any(String)
-                },
-                `
+        return request
+          .put(`/api/auth/users/${body._id}/roles/admin`)
+          .set('Authorization', user.token)
+          .expect(200)
+          .then(result => {
+            expect(result.body).toMatchInlineSnapshot(
+              {
+                _id: expect.any(String),
+                hash: expect.any(String)
+              },
+              `
                 Object {
                   "__v": 0,
                   "_id": Any<String>,
@@ -155,9 +149,47 @@ describe('Auth API', () => {
                   "roles": Array [],
                 }
               `
-              );
-            })
-        );
+            );
+          });
+      });
+  });
+  it('allows an admin to delete roles', () => {
+    return request
+      .post('/api/auth/signup')
+      .send({ email: 'new@new.com', password: '123' })
+      .expect(200)
+      .then(({ body }) => {
+        return request
+          .put(`/api/auth/users/${body._id}/roles/admin`)
+          .set('Authorization', user.token)
+          .expect(200)
+          .then(result => {
+            return request
+              .delete(`/api/auth/users/${body._id}/roles/admin`)
+              .set('Authorization', user.token)
+              .expect(200);
+          })
+          .then(finalResult => {
+            console.log(finalResult.body);
+            expect(finalResult.body).toMatchInlineSnapshot(
+              {
+                _id: expect.any(String),
+                hash: expect.any(String)
+              },
+              `
+              Object {
+                "__v": 0,
+                "_id": Any<String>,
+                "email": "new@new.com",
+                "favorites": Array [],
+                "hash": Any<String>,
+                "roles": Array [
+                  "admin",
+                ],
+              }
+            `
+            );
+          });
       });
   });
 });
