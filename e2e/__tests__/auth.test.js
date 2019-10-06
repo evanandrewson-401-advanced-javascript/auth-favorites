@@ -197,21 +197,17 @@ describe('Auth API', () => {
       .set('Authorization', user.token)
       .expect(200)
       .then(({ body }) => {
-        expect(body).toMatchInlineSnapshot(
-          [
-            {
-              _id: expect.any(String)
-            }
-          ],
+        expect(body[0]).toMatchInlineSnapshot(
+          {
+            _id: expect.any(String)
+          },
           `
           Object {
-            "0": Object {
-              "_id": "5d9a67313dcd4d445d7a657e",
-              "email": "me@me.com",
-              "roles": Array [
-                "admin",
-              ],
-            },
+            "_id": Any<String>,
+            "email": "me@me.com",
+            "roles": Array [
+              "admin",
+            ],
           }
         `
         );
