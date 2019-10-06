@@ -1,9 +1,11 @@
 const request = require('../request');
 const { dropCollection } = require('../db');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
+require('../../lib/models/register-plugins');
+const User = require('../../lib/models/user');
 
 describe('Auth API', () => {
-
   beforeEach(() => dropCollection('users'));
 
   const testUser = {
@@ -18,7 +20,22 @@ describe('Auth API', () => {
       .post('/api/auth/signup')
       .send(testUser)
       .expect(200)
-      .then(({ body }) => user = body);
+      .then(({ body }) => {
+        return User.updateById(body._id, {
+          $addToSet: {
+            roles: 'admin'
+          }
+        })
+          .then(updateUser => {
+            return request
+              .post('/api/auth/signin')
+              .send(testUser)
+              .expect(200);
+          })
+          .then(({ body }) => {
+            user = body;
+          });
+      });
   });
 
   it('signs up a user', () => {
@@ -47,10 +64,18 @@ describe('Auth API', () => {
     });
   }
 
-  testEmailAndPasswordRequired('signup', 'email', { password: 'I no like emails' });
-  testEmailAndPasswordRequired('signup', 'password', { email: 'no@password.com' });
-  testEmailAndPasswordRequired('signin', 'email', { password: 'I no like emails' });
-  testEmailAndPasswordRequired('signin', 'password', { email: 'no@password.com' });
+  testEmailAndPasswordRequired('signup', 'email', {
+    password: 'I no like emails'
+  });
+  testEmailAndPasswordRequired('signup', 'password', {
+    email: 'no@password.com'
+  });
+  testEmailAndPasswordRequired('signin', 'email', {
+    password: 'I no like emails'
+  });
+  testEmailAndPasswordRequired('signin', 'password', {
+    email: 'no@password.com'
+  });
 
   it('signs in a user', () => {
     return request
@@ -74,7 +99,7 @@ describe('Auth API', () => {
     });
   }
 
-  testBadSignup('rejects bad password', { 
+  testBadSignup('rejects bad password', {
     email: testUser.email,
     password: 'bad password'
   });
@@ -98,4 +123,41 @@ describe('Auth API', () => {
       .expect(401);
   });
 
+  it.only('allows an admin to change roles', async () => {
+    // const users = await User.find()
+    // console.log(users);
+    return request
+      .post('/api/auth/signup')
+      .send({ email: 'new@new.com', password: '123' })
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body);
+        return (
+          request
+            .put(`/api/auth/users/${body._id}/roles/admin`)
+            .set('Authorization', user.token)
+            // .send({roles: ['admin']})
+            .expect(200)
+            .then(result => {
+              console.log(result.body);
+              expect(result.body).toMatchInlineSnapshot(
+                {
+                  _id: expect.any(String),
+                  hash: expect.any(String)
+                },
+                `
+                Object {
+                  "__v": 0,
+                  "_id": Any<String>,
+                  "email": "new@new.com",
+                  "favorites": Array [],
+                  "hash": Any<String>,
+                  "roles": Array [],
+                }
+              `
+              );
+            })
+        );
+      });
+  });
 });

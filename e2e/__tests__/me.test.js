@@ -72,7 +72,6 @@ describe('me API', () => {
               .set('Authorization', user.token)
               .expect(200)
               .then(result2 => {
-                console.log(result2.body)
                 expect(result2.body).toEqual([{ _id: body._id }]);
               });
           });
