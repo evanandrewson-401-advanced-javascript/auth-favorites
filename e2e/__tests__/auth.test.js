@@ -192,4 +192,30 @@ describe('Auth API', () => {
           });
       });
   });
+  it('gets all users and their roles', () => {
+    return request
+      .get('/api/auth/users/')
+      .set('Authorization', user.token)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toMatchInlineSnapshot(
+          [
+            {
+              _id: expect.any(String)
+            }
+          ],
+          `
+          Object {
+            "0": Object {
+              "_id": "5d9a67313dcd4d445d7a657e",
+              "email": "me@me.com",
+              "roles": Array [
+                "admin",
+              ],
+            },
+          }
+        `
+        );
+      });
+  });
 });
