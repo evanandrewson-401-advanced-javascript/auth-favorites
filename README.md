@@ -1,11 +1,11 @@
 # LAB - 
 
-## Lab 13
+## Lab 14
 
 ### Author: Evan Andrewson
 
 ### Links and Resources
-* [submission PR](https://github.com/evanandrewson-401-advanced-javascript/auth-favorites/pull/1)
+* [submission PR](https://github.com/evanandrewson-401-advanced-javascript/auth-favorites/pull/2)
 * [travis](https://travis-ci.com/evanandrewson-401-advanced-javascript/auth-favorites)
 
 #### Running the app
